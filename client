@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import grpc
+
+import client_server_pb2
+import client_server_pb2_grpc
+
+def main():
+    with grpc.insecure_channel('localhost:50051') as channel:
+        stub = client_server_pb2_grpc.DataServiceStub(channel)
+        response = stub.GetData(client_server_pb2.DataRequest(name='hello'))
+        print("Received: " + response.label)
+
+if __name__ == '__main__':
+    main()

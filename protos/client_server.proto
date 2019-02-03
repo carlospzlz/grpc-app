@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package client_server;
+
+// The Data Service definition.
+service DataService
+{
+  rpc GetData(DataRequest) returns (DataReply) { }
+}
+
+// The Data Request containing the name of the data.
+message DataRequest
+{
+  required string name = 1;
+}
+
+// The Data Reply containing a number, a string and a file.
+message DataReply
+{
+  required int32 number = 1;
+  required string label = 2;
+  required bytes file = 3;
+}
+
+// message fileChunck

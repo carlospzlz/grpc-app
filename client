@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+
 import grpc
 
 import app_pb2
@@ -8,8 +10,9 @@ import app_pb2_grpc
 def main():
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = app_pb2_grpc.DataServiceStub(channel)
-        response = stub.GetData(app_pb2.DataRequest(name='hello'))
-        print("Received: " + response.label)
+        for line in sys.stdin:
+            response = stub.GetData(app_pb2.DataRequest(name=line))
+            print("Received: " + str(response.number) + ", " + response.label)
 
 if __name__ == '__main__':
     main()

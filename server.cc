@@ -3,15 +3,15 @@
 
 #include <grpcpp/grpcpp.h>
 
-#include "client_server.grpc.pb.h"
+#include "app.grpc.pb.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using clientserver::DataReply;
-using clientserver::DataRequest;
-using clientserver::DataService;
+using app::DataReply;
+using app::DataRequest;
+using app::DataService;
 
 class DataServiceImpl final : public DataService::Service
 {

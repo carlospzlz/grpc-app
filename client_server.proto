@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package client_server;
+package clientserver;
 
 // The Data Service definition.
 service DataService
@@ -19,7 +19,7 @@ message DataReply
 {
   int32 number = 1;
   string label = 2;
-  repeated bytes file = 3;
+  //repeated bytes file = 3;
 }
 
 // message fileChunck

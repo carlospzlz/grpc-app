@@ -11,15 +11,15 @@ service DataService
 // The Data Request containing the name of the data.
 message DataRequest
 {
-  required string name = 1;
+  string name = 1;
 }
 
 // The Data Reply containing a number, a string and a file.
 message DataReply
 {
-  required int32 number = 1;
-  required string label = 2;
-  required bytes file = 3;
+  int32 number = 1;
+  string label = 2;
+  repeated bytes file = 3;
 }
 
 // message fileChunck

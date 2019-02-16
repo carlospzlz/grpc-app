@@ -1,18 +1,59 @@
 #!/usr/bin/env python3
 
-import sys
+import argparse
 
 import grpc
 
 import app_pb2
 import app_pb2_grpc
 
+
+def parse_args():
+    """
+    """
+    description = (
+        'Example client to request a number, string or file to the server')
+    parser = argparse.ArgumentParser(description= description)
+    parser.add_argument('IDENTIFIER',
+                        help='Identifier of the resource requested')
+    parser.add_argument('--request', '-r', required=True,
+                        choices=['number', 'string', 'file'],
+                        help='Type of data to request.')
+    return parser.parse_args()
+
+def getNumber(identifier, stub):
+    """
+    """
+    name = identifier
+    response = stub.GetNumber(app_pb2.NumberRequest(name=name))
+    print('Received Number: ' + str(response.number))
+
+def getString(identifier, stub):
+    """
+    """
+    index = int(identifier)
+    response = stub.GetString(app_pb2.StringRequest(index=index))
+    print('Received String: ' + response.string_)
+
+def getFile(identifier, stub):
+    """
+    """
+    pass
+
+GET = {
+    'number': getNumber,
+    'string': getString,
+    'file': getFile,
+}
+
 def main():
+    args = parse_args()
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = app_pb2_grpc.DataServiceStub(channel)
-        for line in sys.stdin:
-            response = stub.GetData(app_pb2.DataRequest(name=line))
-            print("Received: " + str(response.number) + ", " + response.label)
+        try:
+            GET[args.request](args.IDENTIFIER, stub)
+        except grpc.RpcError as e:
+            print('ERROR: ' + str(e.code()) + ': ' + e.details())
 
 if __name__ == '__main__':
     main()

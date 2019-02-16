@@ -5,21 +5,43 @@ package app;
 // The Data Service definition.
 service DataService
 {
-  rpc GetData(DataRequest) returns (DataReply) { }
+  rpc GetNumber(NumberRequest) returns (NumberReply) { }
+  rpc GetString(StringRequest) returns (StringReply) { }
+  rpc GetFile(StringRequest) returns (FileReply) { }
 }
 
-// The Data Request containing the name of the data.
-message DataRequest
+// The Number Request containing the name of the number.
+message NumberRequest
 {
   string name = 1;
 }
 
-// The Data Reply containing a number, a string and a file.
-message DataReply
+// The Number Reply containing the number.
+message NumberReply
 {
   int32 number = 1;
-  string label = 2;
-  //repeated bytes file = 3;
 }
 
-// message fileChunck
+// The String Request containing the index of the string.
+message StringRequest
+{
+  int32 index = 1;
+}
+
+// The String Reply containing the string.
+message StringReply
+{
+  string string_ = 1;
+}
+
+// The File Request containing the name of the file.
+message FileRequest
+{
+  string name = 1;
+}
+
+// The File Reply containing a chunk of the file.
+message FileReply
+{
+  bytes fileChunk = 1;
+}

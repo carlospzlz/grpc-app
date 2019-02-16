@@ -1,22 +1,27 @@
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 #include <grpcpp/grpcpp.h>
 
 #include "app.grpc.pb.h"
 
 using app::DataService;
-using app::FileReply;
+using app::FileChunk;
 using app::FileRequest;
 using app::NumberReply;
 using app::NumberRequest;
 using app::StringReply;
 using app::StringRequest;
+
 using grpc::Server;
+using grpc::ServerWriter;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 using grpc::StatusCode;
+
+static const size_t FILE_CHUNK_SIZE = 1<<10;  // 1KB
 
 class DataServiceImpl final : public DataService::Service
 {
@@ -55,6 +60,21 @@ private:
       return Status(StatusCode::NOT_FOUND, details);
     }
     reply->set_string_(m_strings[index]);
+    return Status::OK;
+  }
+
+  Status GetFile(ServerContext* context, const FileRequest* request,
+                 ServerWriter<FileChunk>* writer) override
+  {
+    (void)(context);
+    std::cout << "GetFile " << request->filename() << std::endl;
+    std::ifstream ifs;
+    ifs.open(request->filename(), std::ifstream::in | std::ifstream::binary);
+    if (!ifs)
+    {
+      std::cout << "not there" << std::endl;
+    }
+    char chunk[FILE_CHUNK_SIZE];
     return Status::OK;
   }
 

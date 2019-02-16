@@ -7,7 +7,7 @@ service DataService
 {
   rpc GetNumber(NumberRequest) returns (NumberReply) { }
   rpc GetString(StringRequest) returns (StringReply) { }
-  rpc GetFile(StringRequest) returns (FileReply) { }
+  rpc GetFile(FileRequest) returns (stream FileChunk) { }
 }
 
 // The Number Request containing the name of the number.
@@ -37,11 +37,11 @@ message StringReply
 // The File Request containing the name of the file.
 message FileRequest
 {
-  string name = 1;
+  string filename = 1;
 }
 
-// The File Reply containing a chunk of the file.
-message FileReply
+// The File Chunk containing a part of the file.
+message FileChunk
 {
-  bytes fileChunk = 1;
+  bytes content = 1;
 }

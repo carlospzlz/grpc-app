@@ -31,6 +31,9 @@ def getNumber(identifier, stub):
 def getString(identifier, stub):
     """
     """
+    if not identifier.isdigit():
+        print("ERROR: Identifier expected to be a valid index: " + identifier)
+        return
     index = int(identifier)
     response = stub.GetString(app_pb2.StringRequest(index=index))
     print('Received String: ' + response.string_)
@@ -38,7 +41,11 @@ def getString(identifier, stub):
 def getFile(identifier, stub):
     """
     """
-    pass
+    filename = identifier
+    responses = stub.GetFile(app_pb2.FileRequest(filename=filename))
+    for r in responses:
+        print(r.content)
+    print('Received File: ' + filename)
 
 GET = {
     'number': getNumber,

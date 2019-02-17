@@ -1,5 +1,4 @@
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <memory>
 
@@ -22,32 +21,7 @@ using grpc::ServerWriter;
 using grpc::Status;
 using grpc::StatusCode;
 
-// static const size_t FILE_CHUNK_SIZE = 1<<10;  // 1KB
-static const size_t FILE_CHUNK_SIZE = 20;  // 1KB
-
-static std::string base64_encode(const std::string& in)
-{
-  std::string out;
-  int val = 0, valb = -6;
-  for (unsigned char c : in)
-  {
-    val = (val << 8) + c;
-    valb += 8;
-    while (valb >= 0)
-    {
-      out.push_back(
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-              [(val >> valb) & 0x3F]);
-      valb -= 6;
-    }
-  }
-  if (valb > -6)
-    out.push_back(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-            [((val << 8) >> (valb + 8)) & 0x3F]);
-  while (out.size() % 4) out.push_back('=');
-  return out;
-}
+static const size_t FILE_CHUNK_SIZE = 1<<10;  // 1KB
 
 class DataServiceImpl final : public DataService::Service
 {
@@ -93,7 +67,6 @@ private:
                  ServerWriter<FileChunk>* writer) override
   {
     (void)(context);
-    std::cout << "GetFile " << request->filename() << std::endl;
     std::ifstream ifs;
     std::string filename = request->filename();
     ifs.open(filename, std::ifstream::in | std::ifstream::binary);
@@ -102,32 +75,12 @@ private:
       const std::string details("File " + filename + " not found");
       return Status(StatusCode::NOT_FOUND, details);
     }
-    char chunk[FILE_CHUNK_SIZE] = {0};
+    std::string chunk(FILE_CHUNK_SIZE, '\0');
     while (ifs)
     {
-      ifs.read(chunk, FILE_CHUNK_SIZE);
-      std::cout << "--- chunk ---" << std::endl;
-      std::cout << "raw: " << chunk << std::endl;
-      std::string s;
-      for (const char c : chunk)
-      {
-          s.push_back(c);
-      }
-      std::cout << "Read " << ifs.gcount() << " bytes" << std::endl;
-      std::cout << "Send:" << std::endl;
-      std::cout << chunk << std::endl;
-      //std::string in(chunk);
-      //std::cout << std::string(chunk) << std::endl;
-      //std::string out = base64_encode(in);
-      //std::cout << out << std::endl;
-      for (size_t i = 0; i < FILE_CHUNK_SIZE; ++i)
-      {
-        std::cout << std::setfill('0') << std::setw(2) << std::hex
-                  << (int)chunk[i] << " ";
-      }
-      std::cout << std::endl;
+      ifs.read(&chunk[0], FILE_CHUNK_SIZE);
       FileChunk fileChunk;
-      fileChunk.set_content(s);
+      fileChunk.set_content(chunk);
       fileChunk.set_size(ifs.gcount());
       writer->Write(fileChunk);
     }

@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import base64
 
 import grpc
 
@@ -12,6 +11,7 @@ import app_pb2_grpc
 
 def parse_args():
     """
+    Parses arguments given by the user in the command line.
     """
     description = (
         'Example client to request a number, string or file to the server')
@@ -25,6 +25,7 @@ def parse_args():
 
 def getNumber(identifier, stub):
     """
+    Requests the Number with name `identifier` to the server.
     """
     name = identifier
     response = stub.GetNumber(app_pb2.NumberRequest(name=name))
@@ -32,9 +33,11 @@ def getNumber(identifier, stub):
 
 def getString(identifier, stub):
     """
+    Requests the String with index `identifier` to the server.
     """
     if not identifier.isdigit():
-        print("ERROR: Identifier expected to be a valid index: " + identifier)
+        msg = 'ERROR: Identifier expected to be a valid index: {}'
+        print(msg.format(identifier))
         return
     index = int(identifier)
     response = stub.GetString(app_pb2.StringRequest(index=index))
@@ -42,21 +45,20 @@ def getString(identifier, stub):
 
 def getFile(identifier, stub):
     """
+    Requests the File with filepath `identifier` to the server. This method
+    will write the received file in the directory where the script runs from
+    if it does not exist already.
     """
     filepath = identifier
     filename = os.path.basename(filepath)
-    responses = stub.GetFile(app_pb2.FileRequest(filename=filepath))
+    if os.path.isfile(filename):
+        msg = 'ERROR: File already exists: {}'
+        print(msg.format(filepath))
+        return
+    fileChunks = stub.GetFile(app_pb2.FileRequest(filename=filepath))
     with open(os.path.basename(filename), 'ba') as file_:
-        for r in responses:
-            print ("--- chunk ---")
-            print(type(r.content))
-            print("Size: ", len(r.content))
-            print("Received size:" + str(r.size))
-            print(r.content)
-            #content = base64.b64decode(r.content)
-            hexas = ":".join("{:02x}".format(c) for c in r.content)
-            print(hexas)
-            file_.write(r.content[:r.size])
+        for fileChunk in fileChunks:
+            file_.write(fileChunk.content[:fileChunk.size])
     print('Received File: ' + filename)
 
 GET = {
@@ -76,3 +78,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

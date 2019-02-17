@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 
 import grpc
 
@@ -41,10 +42,14 @@ def getString(identifier, stub):
 def getFile(identifier, stub):
     """
     """
-    filename = identifier
-    responses = stub.GetFile(app_pb2.FileRequest(filename=filename))
-    for r in responses:
-        print(r.content)
+    filepath = identifier
+    filename = os.path.basename(filepath)
+    responses = stub.GetFile(app_pb2.FileRequest(filename=filepath))
+    with open(os.path.basename(filename), 'ba') as file_:
+        for r in responses:
+            print(r.content)
+            print(r.size)
+            file_.write(r.content[:r.size])
     print('Received File: ' + filename)
 
 GET = {

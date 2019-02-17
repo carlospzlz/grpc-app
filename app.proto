@@ -44,4 +44,5 @@ message FileRequest
 message FileChunk
 {
   bytes content = 1;
+  int32 size = 2;
 }

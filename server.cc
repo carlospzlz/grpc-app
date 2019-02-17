@@ -69,12 +69,23 @@ private:
     (void)(context);
     std::cout << "GetFile " << request->filename() << std::endl;
     std::ifstream ifs;
-    ifs.open(request->filename(), std::ifstream::in | std::ifstream::binary);
+    std::string filename = request->filename();
+    ifs.open(filename, std::ifstream::in | std::ifstream::binary);
     if (!ifs)
     {
-      std::cout << "not there" << std::endl;
+      const std::string details("File " + filename + " not found");
+      return Status(StatusCode::NOT_FOUND, details);
     }
     char chunk[FILE_CHUNK_SIZE];
+    while (ifs)
+    {
+        ifs.read(chunk, FILE_CHUNK_SIZE);
+        std::cout << "Read " << ifs.gcount() << " bytes" << std::endl;
+        FileChunk fileChunk;
+        fileChunk.set_content(std::string(chunk));
+        fileChunk.set_size(ifs.gcount());
+        writer->Write(fileChunk);
+    }
     return Status::OK;
   }
 

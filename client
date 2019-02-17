@@ -14,8 +14,12 @@ def parse_args():
     Parses arguments given by the user in the command line.
     """
     description = (
-        'Example client to request a number, string or file to the server')
+        'Example client to request a number, string or file to the server.')
     parser = argparse.ArgumentParser(description= description)
+    parser.add_argument('--hostname', '-H', default='localhost',
+                        help='Hostname where the server is running (localhost)')
+    parser.add_argument('--port', '-p', default='50051',
+                        help='Port where the server is running (50051)')
     parser.add_argument('IDENTIFIER',
                         help='Identifier of the resource requested')
     parser.add_argument('--request', '-r', required=True,
@@ -23,13 +27,15 @@ def parse_args():
                         help='Type of data to request.')
     return parser.parse_args()
 
+
 def getNumber(identifier, stub):
     """
     Requests the Number with name `identifier` to the server.
     """
     name = identifier
     response = stub.GetNumber(app_pb2.NumberRequest(name=name))
-    print('Received Number: ' + str(response.number))
+    print('Received Number: {}'.format(response.number))
+
 
 def getString(identifier, stub):
     """
@@ -41,13 +47,13 @@ def getString(identifier, stub):
         return
     index = int(identifier)
     response = stub.GetString(app_pb2.StringRequest(index=index))
-    print('Received String: ' + response.string_)
+    print('Received String: {}'.format(response.string_))
+
 
 def getFile(identifier, stub):
     """
     Requests the File with filepath `identifier` to the server. This method
-    will write the received file in the directory where the script runs from
-    if it does not exist already.
+    will write the received file in the current directory if it does not exist.
     """
     filepath = identifier
     filename = os.path.basename(filepath)
@@ -59,7 +65,8 @@ def getFile(identifier, stub):
     with open(os.path.basename(filename), 'ba') as file_:
         for fileChunk in fileChunks:
             file_.write(fileChunk.content[:fileChunk.size])
-    print('Received File: ' + filename)
+    print('Received File: {}'.format(filename))
+
 
 GET = {
     'number': getNumber,
@@ -67,14 +74,17 @@ GET = {
     'file': getFile,
 }
 
+
 def main():
     args = parse_args()
-    with grpc.insecure_channel('localhost:50051') as channel:
+    endpoint = "{}:{}".format(args.hostname, args.port)
+    with grpc.insecure_channel(endpoint) as channel:
         stub = app_pb2_grpc.DataServiceStub(channel)
         try:
             GET[args.request](args.IDENTIFIER, stub)
         except grpc.RpcError as e:
-            print('ERROR: ' + str(e.code()) + ': ' + e.details())
+            print('ERROR: {}: {}'.format(e.code(), e.details()))
+
 
 if __name__ == '__main__':
     main()

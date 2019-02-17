@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import base64
 
 import grpc
 
@@ -47,8 +48,14 @@ def getFile(identifier, stub):
     responses = stub.GetFile(app_pb2.FileRequest(filename=filepath))
     with open(os.path.basename(filename), 'ba') as file_:
         for r in responses:
+            print ("--- chunk ---")
+            print(type(r.content))
+            print("Size: ", len(r.content))
+            print("Received size:" + str(r.size))
             print(r.content)
-            print(r.size)
+            #content = base64.b64decode(r.content)
+            hexas = ":".join("{:02x}".format(c) for c in r.content)
+            print(hexas)
             file_.write(r.content[:r.size])
     print('Received File: ' + filename)
 

@@ -41,8 +41,8 @@ def main():
     with grpc.insecure_channel(endpoint) as channel:
         stub = app_pb2_grpc.DataServiceStub(channel)
         try:
-            resource = GET[args.request](args.IDENTIFIER, stub)
-            print("Received data: {}".format(resource))
+            data = GET[args.request](args.IDENTIFIER, stub)
+            print("Received data: {}".format(data))
         except grpc.RpcError as e:
             print('ERROR: {}: {}'.format(e.code(), e.details()))
 

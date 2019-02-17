@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
 
 import grpc
 
-import app_pb2
 import app_pb2_grpc
+
+import client_core
 
 
 def parse_args():
@@ -28,50 +28,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def getNumber(identifier, stub):
-    """
-    Requests the Number with name `identifier` to the server.
-    """
-    name = identifier
-    response = stub.GetNumber(app_pb2.NumberRequest(name=name))
-    print('Received Number: {}'.format(response.number))
-
-
-def getString(identifier, stub):
-    """
-    Requests the String with index `identifier` to the server.
-    """
-    if not identifier.isdigit():
-        msg = 'ERROR: Identifier expected to be a valid index: {}'
-        print(msg.format(identifier))
-        return
-    index = int(identifier)
-    response = stub.GetString(app_pb2.StringRequest(index=index))
-    print('Received String: {}'.format(response.string_))
-
-
-def getFile(identifier, stub):
-    """
-    Requests the File with filepath `identifier` to the server. This method
-    will write the received file in the current directory if it does not exist.
-    """
-    filepath = identifier
-    filename = os.path.basename(filepath)
-    if os.path.isfile(filename):
-        msg = 'ERROR: File already exists: {}'
-        print(msg.format(filepath))
-        return
-    fileChunks = stub.GetFile(app_pb2.FileRequest(filename=filepath))
-    with open(os.path.basename(filename), 'ba') as file_:
-        for fileChunk in fileChunks:
-            file_.write(fileChunk.content[:fileChunk.size])
-    print('Received File: {}'.format(filename))
-
-
 GET = {
-    'number': getNumber,
-    'string': getString,
-    'file': getFile,
+    'number': client_core.getNumber,
+    'string': client_core.getString,
+    'file': client_core.getFile,
 }
 
 
@@ -81,7 +41,8 @@ def main():
     with grpc.insecure_channel(endpoint) as channel:
         stub = app_pb2_grpc.DataServiceStub(channel)
         try:
-            GET[args.request](args.IDENTIFIER, stub)
+            resource = GET[args.request](args.IDENTIFIER, stub)
+            print("Received data: {}".format(resource))
         except grpc.RpcError as e:
             print('ERROR: {}: {}'.format(e.code(), e.details()))
 

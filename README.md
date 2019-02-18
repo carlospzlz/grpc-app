@@ -71,7 +71,7 @@ To request a number you need to provide the name of that number.
 ```
 ./client --request number one
 ```
-*Only the one, two, three and four are available*
+*Only one, two, three and four are available*
 
 #### Requesting one String
 To request a string you need to provide the index in the server's storage
@@ -86,4 +86,4 @@ To request a file you need to provide the file path.
 ```
 ./client --request file files/helloworld.txt
 ```
-The file will be transmitted and copied to the current directory.
+The file will be transmitted and written to the current directory.

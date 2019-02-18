@@ -35,7 +35,8 @@ To run the server you need to provide a `hostname` and a `port number`.
 
 Run the Tests
 -------------
-Some tests are provided with this project to verify the correct functioning of the system.
+Some tests are provided with this project to verify the correct functioning of
+ the system.
 ```
 nosetests -v
 ```
@@ -62,7 +63,8 @@ OK
 
 Run the Client
 --------------
-The Client is a simple Python script that can be run to perform requests to the server.
+The Client is a simple Python script that can be run to perform requests to the
+ server.
 
 #### Requesting one Number
 To request a number you need to provide the name of that number.
@@ -72,7 +74,8 @@ To request a number you need to provide the name of that number.
 *Only the one, two, three and four are available*
 
 #### Requesting one String
-To request a string you need to provide the index in the server's storage vector.
+To request a string you need to provide the index in the server's storage
+ vector.
 ```
 ./client --request string 0
 ```

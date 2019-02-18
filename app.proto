@@ -5,8 +5,26 @@ package app;
 // The Data Service definition.
 service DataService
 {
+  // A simple RPC that returns a Number.
+  //
+  // Obtains the number with the given name. These are the available names:
+  // [ "one", "two", "three", "four" ]
   rpc GetNumber(NumberRequest) returns (NumberReply) { }
+
+  // A simple RPC that returns a String.
+  //
+  // Obtains the string at the given index in the storage vector. This is the
+  // server's storage vector:
+  // [ "foo", "bar", "spam", "ham", "eggs" ]
   rpc GetString(StringRequest) returns (StringReply) { }
+
+  // A server-to-client streaming RPC that returns a File.
+  //
+  // Returns a file as a stream of chunks. This way, both the server and the
+  // client do not need to bring the whole file to memory. This approach is
+  // particularly appropriate for trasmitting big files (> 1GB). Also, this
+  // could facilitate to handle interruptions or partial file recoveries in the
+  // future.
   rpc GetFile(FileRequest) returns (stream FileChunk) { }
 }
 

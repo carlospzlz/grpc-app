@@ -33,6 +33,11 @@ public:
   }
 
 private:
+  // Obtains the number with the given name. The available names are stored in
+  // m_numbers: [ "one", "two", "three", "four" ].
+  //
+  // If the given name doesn't name any known number a NOT FOUND Status Code
+  // is returned.
   Status GetNumber(ServerContext* context, const NumberRequest* request,
                    NumberReply* reply) override
   {
@@ -48,6 +53,11 @@ private:
     return Status::OK;
   }
 
+  // Obtains the string at the given index in the storage vector. The string
+  // storage vector is m_strings: [ "foo", "bar", "spam", "ham", "eggs" ].
+  //
+  // If the given index is out of the bounds of m_strings a NOT FOUND Status
+  // Code is returned.
   Status GetString(ServerContext* context, const StringRequest* request,
                    StringReply* reply) override
   {
@@ -63,6 +73,14 @@ private:
     return Status::OK;
   }
 
+  // Returns a file as a stream of chunks. This way, both the server and the
+  // client do not need to bring the whole file to memory. This approach is
+  // particularly appropriate for trasmitting big files (> 1GB). Also, this
+  // could facilitate to handle interruptions or partial file recoveries in the
+  // future.
+  //
+  // If the given filename is not found in the filesystem a NOT FOUND Status
+  // Code is returned.
   Status GetFile(ServerContext* context, const FileRequest* request,
                  ServerWriter<FileChunk>* writer) override
   {

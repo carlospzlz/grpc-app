@@ -21,7 +21,7 @@ using grpc::ServerWriter;
 using grpc::Status;
 using grpc::StatusCode;
 
-static const size_t FILE_CHUNK_SIZE = 1<<10;  // 1KB
+static const size_t FILE_CHUNK_SIZE = 1 << 10;  // 1KB
 
 class DataServiceImpl final : public DataService::Service
 {
